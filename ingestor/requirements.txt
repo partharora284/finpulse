@@ -1,0 +1,16 @@
+# Version ranges (not exact pins) are used deliberately so that `pip`
+# resolves to a recent release that ships a pre-built wheel for your
+# platform/Python version, rather than falling back to a source
+# distribution that requires a local C/C++ toolchain (this is what caused
+# the Windows "meson-python build" / missing MSVC / vswhere.exe failures).
+# Each range still has a floor (a known-good minimum) and, where it
+# matters, a ceiling (to avoid an untested future major version silently
+# breaking the build) — so this stays reproducible without being brittle.
+
+yfinance>=0.2.43,<0.3.0
+pandas>=2.2.0,<3.0.0
+numpy>=1.26.0,<3.0.0
+SQLAlchemy>=2.0.31,<3.0.0
+psycopg2-binary>=2.9.9,<3.0.0
+schedule>=1.2.2,<2.0.0
+python-dotenv>=1.0.1,<2.0.0
