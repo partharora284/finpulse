@@ -1,0 +1,81 @@
+# =============================================================================
+# FinPulse — Automated Financial Market Data Pipeline & Statistical Drift Monitor
+# Multi-service orchestration: db (PostgreSQL) -> ingestor (worker) -> dashboard
+# =============================================================================
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: finpulse_db
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-finpulse}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finpulse_pw}
+      POSTGRES_DB: ${POSTGRES_DB:-finpulse_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - finpulse_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-finpulse} -d ${POSTGRES_DB:-finpulse_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - finpulse_net
+
+  ingestor:
+    build:
+      context: ./ingestor
+      dockerfile: Dockerfile
+    container_name: finpulse_ingestor
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - finpulse_net
+
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: finpulse_dashboard
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+    ports:
+      - "8501:8501"
+    depends_on:
+      db:
+        condition: service_healthy
+      ingestor:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - finpulse_net
+
+volumes:
+  finpulse_pgdata:
+    name: finpulse_pgdata
+
+networks:
+  finpulse_net:
+    name: finpulse_net
+    driver: bridge
