@@ -1,0 +1,17 @@
+# Version ranges (not exact pins) are used deliberately so that `pip`
+# resolves to a recent release that ships a pre-built wheel for your
+# platform/Python version, rather than falling back to a source
+# distribution that requires a local C/C++ toolchain (this is what caused
+# the Windows "meson-python build" / missing MSVC / vswhere.exe failures).
+# Each range still has a floor (a known-good minimum) and, where it
+# matters, a ceiling (to avoid an untested future major version silently
+# breaking the build) — so this stays reproducible without being brittle.
+
+streamlit>=1.38.0,<2.0.0
+pandas>=2.2.0,<3.0.0
+numpy>=1.26.0,<3.0.0
+SQLAlchemy>=2.0.31,<3.0.0
+psycopg2-binary>=2.9.9,<3.0.0
+plotly>=5.23.0,<6.0.0
+scipy>=1.13.0,<2.0.0
+python-dotenv>=1.0.1,<2.0.0
