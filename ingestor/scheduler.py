@@ -62,7 +62,7 @@ def _get_tickers() -> List[str]:
 def _get_config() -> dict:
     return {
         "tickers": _get_tickers(),
-        "lookback_period": os.getenv("LOOKBACK_PERIOD", "2y"),
+        "lookback_period": os.getenv("LOOKBACK_PERIOD", "5y"),
         "volatility_window": int(os.getenv("VOLATILITY_WINDOW", "20")),
         "poll_interval_minutes": int(os.getenv("POLL_INTERVAL_MINUTES", "1440")),
         "max_retries": int(os.getenv("MAX_RETRIES", "5")),
